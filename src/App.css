@@ -1059,3 +1059,43 @@ a {
 /* -------------- */
 /* Product.css */
 
+/* Navbar css */
+/* Navbar.css */
+
+.site-navbar {
+  position: relative;
+}
+
+.mobile-nav {
+  position: absolute;
+  top: 60px; /* Adjust this value based on your navbar height */
+  left: 0;
+  width: 100%;
+  background-color: white;
+  z-index: 10;
+  border-top: 1px solid #ddd;
+}
+
+.mobile-nav .site-menu {
+  display: flex;
+  flex-direction: column;
+  padding: 10px;
+}
+
+.mobile-nav .site-menu li {
+  margin: 10px 0;
+}
+
+.site-menu-toggle {
+  cursor: pointer;
+}
+
+.site-menu-toggle .icon-menu {
+  font-size: 24px;
+}
+
+@media (max-width: 991px) {
+  .main-nav {
+      display: none;
+  }
+}

@@ -35,7 +35,7 @@ function OrderDetails({ cart }) {
 
                                         <tr>
                                             <td>{item.product_name} <strong className="mx-2">x</strong> {item.qty}</td>
-                                            <td>${item.qty*item.price}</td>
+                                            <td>{item.qty*item.price}</td>
                                         </tr>
 
 
@@ -48,7 +48,7 @@ function OrderDetails({ cart }) {
                         }
                         <tr>
                             <td className="text-black font-weight-bold"><strong>Order Total</strong></td>
-                            <td className="text-black font-weight-bold"><strong>${total}</strong></td>
+                            <td className="text-black font-weight-bold"><strong><span>&#8377;</span>{total}</strong></td>
                         </tr>
                     </table>
 

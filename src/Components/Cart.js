@@ -1,39 +1,33 @@
 import React, { useContext, useState, useEffect } from 'react';
 import { useCart } from '../Context/CartContext';
 import { AuthContext } from '../Context/AuthContext';
-import { Form, Button } from 'react-bootstrap';
+import { Button } from 'react-bootstrap';
 import DIrection from './DIrection';
 import { Link, useNavigate } from 'react-router-dom';
 
 function Cart() {
-
-  const { state: { cart, loading, error }, removeItemFromCart, updateCartAfterLogin } = useCart();
+  const { state: { cart, loading, error }, removeItemFromCart } = useCart();
   const [total, setTotal] = useState(0);
   const { email } = useContext(AuthContext);
-  console.log('In cart: ', email);
-
-  useEffect(() => {
-    if (email) {
-      updateCartAfterLogin(email);
-    }
-  }, [email]);
-
+  const navigate = useNavigate();
+  
   useEffect(() => {
     // Calculate total whenever cart changes
-
     const newTotal = cart.reduce((sum, item) => sum + item.price * item.qty, 0);
     setTotal(newTotal);
-
   }, [cart]);
+
+  const handleRemoveItem = (product_id, size) => {
+    removeItemFromCart(product_id, size);
+  };
 
   if (loading) return <div>Loading...</div>;
   if (error) return <div>Error: {error}</div>;
 
   return (
     <div>
-      <DIrection title={"cart"}></DIrection>
+      <DIrection title={"cart"} />
       <div className='site'>
-
         <div className="site-section">
           <div className="container">
             <div className="row mb-5">
@@ -59,14 +53,14 @@ function Cart() {
                           <td className="product-name">
                             <h2 className="h5 text-black">{item.product_name}</h2>
                           </td>
-                          <td><h4 className='h5'>${item.price}</h4></td>
+                          <td><h4 className='h5'><span>&#8377;</span>{item.price}</h4></td>
                           <td>
                             <h2 className="h5 text-black">{item.qty}</h2>
                           </td>
-                          <td><h5>${(item.price * item.qty).toFixed(2)}</h5></td>
+                          <td><h5><span>&#8377;</span>{(item.price * item.qty).toFixed(2)}</h5></td>
                           <td>
                             <Button className="btn btn-primary height-auto btn-sm"
-                              onClick={() => removeItemFromCart(item.product_id, item.size)}
+                              onClick={() => handleRemoveItem(item.product_id, item.size)}
                             >X</Button>
                           </td>
                         </tr>
@@ -104,7 +98,7 @@ function Cart() {
                       </div>
                       <div className="col-md-6 text-right">
                         <strong className="text-black">
-                          ${total.toFixed(2)}
+                        <span>&#8377;</span>{total.toFixed(2)}
                         </strong>
                       </div>
                     </div>
@@ -120,7 +114,8 @@ function Cart() {
               </div>
             </div>
           </div>
-        </div></div>
+        </div>
+      </div>
     </div>
   );
 }

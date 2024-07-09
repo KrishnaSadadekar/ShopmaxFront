@@ -5,9 +5,11 @@ function Login() {
 
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
+    console.log('Before CarContext')
     const {login}=useContext(AuthContext);
     const navigate=useNavigate();
     const location = useLocation();
+    const [reloadPage, setReloadPage] = useState(false);
     const handleSubmit = async(e) => {
         e.preventDefault();
         console.log(username,password);
@@ -18,6 +20,8 @@ function Login() {
                 
                 const redirectTo = location.state?.from?.pathname || '/';
                 navigate(redirectTo);
+                window.location.reload();
+                
             }
             else
             {

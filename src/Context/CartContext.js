@@ -1,5 +1,6 @@
+// Context/CartContext.js
 import React, { createContext, useReducer, useContext, useEffect } from 'react';
-import axios from 'axios';
+import { CartService } from '../Service/CartService';
 import { AuthContext } from './AuthContext';
 
 const CartContext = createContext();
@@ -36,30 +37,7 @@ const cartReducer = (state, action) => {
 
 export const CartProvider = ({ children }) => {
   const [state, dispatch] = useReducer(cartReducer, initialState);
-  const { email } = useContext(AuthContext);
-
-  const fetchCart = async () => {
-    dispatch({ type: 'FETCH_CART_REQUEST' });
-    try {
-      const response = await axios.post('http://localhost:4000/api/cart', { email });
-      const cartData = response.data || [];
-      localStorage.setItem('cart', JSON.stringify(cartData));
-      dispatch({ type: 'FETCH_CART_SUCCESS', payload: cartData });
-    } catch (error) {
-      dispatch({ type: 'FETCH_CART_FAILURE', payload: error.message });
-    }
-  };
-
-  const updateCartAfterLogin = async (email) => {
-    try {
-      const response = await axios.post('http://localhost:4000/api/cart', { email });
-      const userCart = response.data || [];
-      localStorage.setItem('cart', JSON.stringify(userCart));
-      dispatch({ type: 'UPDATE_CART', payload: userCart });
-    } catch (error) {
-      console.error('Failed to fetch user cart:', error);
-    }
-  };
+  const { email } = useContext(AuthContext) || {};
 
   useEffect(() => {
     if (email) {
@@ -67,17 +45,27 @@ export const CartProvider = ({ children }) => {
     }
   }, [email]);
 
+  const fetchCart = async () => {
+    dispatch({ type: 'FETCH_CART_REQUEST' });
+    try {
+      const cartData = await CartService.fetchCart(email);
+      localStorage.setItem('cart', JSON.stringify(cartData));
+      dispatch({ type: 'FETCH_CART_SUCCESS', payload: cartData });
+    } catch (error) {
+      dispatch({ type: 'FETCH_CART_FAILURE', payload: error.message });
+    }
+  };
+
   const addItemToCart = async (item) => {
     const updatedCart = [...state.cart, item];
     dispatch({ type: 'ADD_ITEM', payload: item });
     localStorage.setItem('cart', JSON.stringify(updatedCart));
 
     try {
-      await axios.post('http://localhost:4000/api/addtocart', { item });
+      await CartService.addItem(item);
       fetchCart();
     } catch (error) {
       console.error('Failed to add item:', error.message);
-      // Optionally handle rollback
     }
   };
 
@@ -87,24 +75,31 @@ export const CartProvider = ({ children }) => {
     localStorage.setItem('cart', JSON.stringify(updatedCart));
 
     try {
-      await axios.post('http://localhost:4000/api/removeitem', { email, product_id, size });
+      await CartService.removeItem(email, product_id, size);
       fetchCart();
     } catch (error) {
       console.error('Failed to remove item:', error.message);
-      // Optionally handle rollback
+      dispatch({ type: 'FETCH_CART_FAILURE', payload: error.message });
     }
   };
 
-  const clearCart = async() => {
+  const clearCart = async () => {
     dispatch({ type: 'CLEAR_CART' });
-    const response = await axios.post('http://localhost:4000/api/clearcart', { email });
-      const cartData = response.data || [];
-      localStorage.setItem('cart', JSON.stringify(cartData))
-    
+    try {
+      await CartService.clearCart(email);
+      localStorage.removeItem('cart');
+    } catch (error) {
+      console.error('Failed to clear cart:', error.message);
+    }
+  };
+
+  const clearCartLocal = () => {
+    localStorage.removeItem('cart');
+    dispatch({ type: 'CLEAR_CART' });
   };
 
   return (
-    <CartContext.Provider value={{ state, dispatch, addItemToCart, removeItemFromCart, clearCart, updateCartAfterLogin }}>
+    <CartContext.Provider value={{ state, dispatch, addItemToCart, removeItemFromCart, clearCart, clearCartLocal }}>
       {children}
     </CartContext.Provider>
   );

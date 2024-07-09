@@ -1,6 +1,7 @@
 import { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { BASE_URL } from "../Service/helper";
 function SignUp() {
     const [formData, setFormData] = useState({
         firstName: '',
@@ -21,7 +22,7 @@ function SignUp() {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const response = await axios.post('http://localhost:4000/api/createuser', formData);
+            const response = await axios.post(`${BASE_URL}/api/createuser`, formData);
 
             if (response.data && response.data.success) {
                 // localStorage.setItem("authToken", response.data.authToken);

@@ -2,6 +2,7 @@ import React, { useState, useEffect, useContext } from 'react';
 import axios from 'axios';
 import { AuthContext } from '../Context/AuthContext';
 import DIrection from '../Components/DIrection';
+import { BASE_URL } from '../Service/helper';
 
 function MyOrders() {
   const { email } = useContext(AuthContext);
@@ -20,7 +21,7 @@ function MyOrders() {
 
       try {
         console.log('Fetching orders for email:', email);
-        const response = await axios.post('http://localhost:4000/api/myorder', { email });
+        const response = await axios.post(`${BASE_URL}/api/myorder`, { email });
         console.log('API response:', response.data);
         setOrders(response.data.orders || []);
       } catch (error) {

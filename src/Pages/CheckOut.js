@@ -8,6 +8,7 @@ import axios from "axios";
 import { useAuth } from "../Context/AuthContext";
 import useRazorpay from "react-razorpay";
 import { useNavigate } from "react-router-dom";
+import { BASE_URL } from "../Service/helper";
 
 function CheckOut() {
   const { state: { cart },clearCart } = useCart();
@@ -44,7 +45,7 @@ function CheckOut() {
       handler: async (response) => {
         try {
           console.log('Payment Response:', response);
-          const verificationResponse = await axios.post('http://localhost:4000/api/verifypayment', {
+          const verificationResponse = await axios.post(`${BASE_URL}/api/verifypayment`, {
             razorpay_order_id: response.razorpay_order_id,
             razorpay_payment_id: response.razorpay_payment_id,
             razorpay_signature: response.razorpay_signature,
@@ -70,7 +71,7 @@ function CheckOut() {
     console.log('Cart:', cart);
     console.log('Billing Details:', billingDetails);
 
-    const response = await axios.post('http://localhost:4000/api/order', billingDetails);
+    const response = await axios.post(`${BASE_URL}/api/order`, billingDetails);
     console.log(response.data);
     // setOrder(response.data.order);
 

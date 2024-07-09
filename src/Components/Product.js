@@ -3,11 +3,12 @@ import React, { useState, useContext } from 'react';
 import { Button, Form } from 'react-bootstrap';
 import { useCart, CartContext } from '../Context/CartContext';
 import { AuthContext } from '../Context/AuthContext';
-
+import { useNavigate } from 'react-router-dom';
 function Product({ Product }) {
     // State to store selected size and quantity
     const { email } = useContext(AuthContext);
     const { addItemToCart } = useCart();
+    const navigate = useNavigate();
     const [item, setItem] = useState({
         email: email,
         product_id: Product.product_id || '', // Ensure to get product_id from Product
@@ -20,7 +21,14 @@ function Product({ Product }) {
     // Handle form submission
     const handleSubmit = async (e) => {
         e.preventDefault();
+        
+        if (!email) {
+            alert('Please login to add items to the cart.');
+            navigate('/login'); // Navigate to login page if not logged in
+            return;
+        }
         try {
+
             await addItemToCart(item);
             alert('Added to cart!');
         } catch (error) {
@@ -71,7 +79,7 @@ function Product({ Product }) {
                             magni iste, velit aperiam quis.
                         </p>
                         <p>
-                            <strong className="text-primary h4">${Product.price}</strong>
+                            <strong className="text-primary h4"><span>&#8377;</span>{Product.price}</strong>
                         </p>
                         <div className="mb-1 d-flex">
                             {['Small', 'Medium', 'Large', 'Extra Large'].map((size) => (
